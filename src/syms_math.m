@@ -47,7 +47,7 @@ A=[0 , 1 , 0 , 0; ...
    0 , 0 , 0 , 1; ...
    0 , (-b*l*m)/a1 , (M*g*l*m+m^2*g*l)/a1 , 0];
 B=[0 ; (I+l^2*m)/a1 ; 0 ; (l*m)/a1];
-C=[1 , 0 , 0 , 0; 0 , 0 , 0 , 0];
+C=[1 , 0 , 0 , 0; 0 , 0 , 1 , 0];
 D=[0 ; 0];
 
 %%part 2
@@ -68,10 +68,16 @@ M=minreal(ss(A,B,C,D));
 
 %%Part 3
 %problem 1
-p=[roots([1 0.8 16]),roots([1 0.8 4])];
+tss=5; %time to steady state
+wnz=4/tss; %b term of CE
+z1=0.2; %damping term 1
+z2=0.4; %damping term 2
 
+%placing max eignvalues
+p=[roots([1 wnz (wnz/z1)^2]),roots([1 wnz (wnz/z2)^2])]; 
+
+%determining controller gains
 k=place(A,B,p-1);
-
 
 %problem 2 
 [V2,s2]=eig(A-B*k);
@@ -81,7 +87,32 @@ k_NL=place(A,B,p-1.5);
 
 %% Part 4
 %problem 1
+C_bar=[1 , 0 , 0 , 0];
+A_bar=[A , zeros(4,1) ; C_bar , zeros(1,1)];
+B_bar=[B ; zeros(1,1)];
+CO_bar=ctrb(A_bar,B_bar);
+rank_C_bar=rank(CO_bar);
 
+syms k1 k2 k3 k4 k5 s
+
+A_C=A_bar-B_bar*[k1 k2 k3 k4 k5];
+
+eqn2=det(s.*eye(length(A_bar))-A_C);
+
+coef=coeffs(eqn2,s);
+%k_bar=solve(eqn2,[k1 k2 k3 k4 k5])
+
+eqn3=expand((s+3.5)*(s+4)*(s+4.5)*(s+5));
+coef2=coeffs(eqn3,s);
+
+e1=coef(1)==coef2(1);
+e2=coef(2)==coef2(2);
+e3=coef(3)==coef2(3);
+e4=coef(4)==coef2(4);
+e5=coef(5)==coef2(5);
+
+k_bar=solve([e1 e2 e3 e4 e5],[k1 k2 k3 k4 k5]);
+k_bar2=double([k_bar.k1 k_bar.k2 k_bar.k3 k_bar.k4 k_bar.k5]);
 
 %% Simulink 
 % Parameters
@@ -99,12 +130,14 @@ x_initial = [0.5 ; 0 ; deg2rad(30) ; 0];
 % Set the Controller:
    % 1 = State-feedback linear model
    % 2 = .... so on
-Controller = 1;
+Controller = 3;
 
 if Controller == 1
+    K = k;
+elseif Controller == 2
     K = k_NL;
-else
-    K = k_NL;
+elseif Controller ==3
+    K=k_bar2;
 end
 
 
@@ -114,12 +147,12 @@ Model = 2;
 
 % Set Desired State
 % Set the desired state: 1 = Regulation, 2 = Setpoint Tracking.
-Desired = 1;
+Desired = 2;
 
 if Desired == 1
     xd = [0 , 0 , 0 , 0];
 else
-    xd = [0 , 0 , 0 , 0];
+    xd = [0.5 , 0 , 0 , 0];
 end
 
 % Run Simulation
