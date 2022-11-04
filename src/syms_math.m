@@ -64,7 +64,87 @@ rnk_O=rank(OB);
 %problem 6
 M=minreal(ss(A,B,C,D));
 %problem 7
-[N,D] = ss2tf(A,B,C,D)
+[N,D] = ss2tf(A,B,C,D);
 
 %%Part 3
+%problem 1
+p=[roots([1 0.8 16]),roots([1 0.8 4])];
+
+k=place(A,B,p-1);
+
+
+%problem 2 
+[V2,s2]=eig(A-B*k);
+
+%problem 3
+k_NL=place(A,B,p-1.5);
+
+%% Part 4
+%problem 1
+
+
+%% Simulink 
+% Parameters
+linewidth = 2;
+fontsize = 14;
+
+% Simualtion Parameters
+dt = 0.002; %integration step,
+tf = 10; %final time, sec
+
+% INTIAL CONDITONS
+x_initial = [0.5 ; 0 ; deg2rad(30) ; 0];
+
+%% Set Controller
+% Set the Controller:
+   % 1 = State-feedback linear model
+   % 2 = .... so on
+Controller = 1;
+
+if Controller == 1
+    K = k_NL;
+else
+    K = k_NL;
+end
+
+
+% Set Model
+% Set the model to use: 1 = linear, 2 = nonlinear.
+Model = 2;
+
+% Set Desired State
+% Set the desired state: 1 = Regulation, 2 = Setpoint Tracking.
+Desired = 1;
+
+if Desired == 1
+    xd = [0 , 0 , 0 , 0];
+else
+    xd = [0 , 0 , 0 , 0];
+end
+
+% Run Simulation
+[t,~,x,u1] = sim('P1_Sim_Simulink');
+%   x is the state vector of [x; x_dot; phi; phi_dot],  4x1 vector
+
+x1 = x(:,1);% Cart x position plot
+phi = x(:,3);
+theta = rad2deg((phi+pi()))-180;
+
+
+%% Plots
+plot(t,x1)
+title('X vs Time')
+xlabel('Time (s)')
+ylabel('X (m)')
+figure
+plot(t,theta)
+title('Theta vs Time')
+xlabel('Time(s)')
+ylabel('Theta(deg)')
+figure
+plot(t,u1)
+title('Input vs Time')
+ylabel('Force (N)')
+xlabel('Time (s)')
+
 
