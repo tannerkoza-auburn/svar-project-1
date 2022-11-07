@@ -75,7 +75,7 @@ z2=0.4; %damping term 2
 
 %placing max eignvalues
 p=[roots([1 wnz (wnz/z1)^2]),roots([1 wnz (wnz/z2)^2])]; 
-
+p=[p(1,1),p(1,2),p(2,1),p(2,2)];
 %determining controller gains
 k=place(A,B,p-1);
 
@@ -93,26 +93,8 @@ B_bar=[B ; zeros(1,1)];
 CO_bar=ctrb(A_bar,B_bar);
 rank_C_bar=rank(CO_bar);
 
-syms k1 k2 k3 k4 k5 s
-
-A_C=A_bar-B_bar*[k1 k2 k3 k4 k5];
-
-eqn2=det(s.*eye(length(A_bar))-A_C);
-
-coef=coeffs(eqn2,s);
-%k_bar=solve(eqn2,[k1 k2 k3 k4 k5])
-
-eqn3=expand((s+3.5)*(s+4)*(s+4.5)*(s+5));
-coef2=coeffs(eqn3,s);
-
-e1=coef(1)==coef2(1);
-e2=coef(2)==coef2(2);
-e3=coef(3)==coef2(3);
-e4=coef(4)==coef2(4);
-e5=coef(5)==coef2(5);
-
-k_bar=solve([e1 e2 e3 e4 e5],[k1 k2 k3 k4 k5]);
-k_bar2=double([k_bar.k1 k_bar.k2 k_bar.k3 k_bar.k4 k_bar.k5]);
+p_bar=[p-1.5,-1.9];
+k_bar=place(A_bar,B_bar,p_bar);
 
 %% Simulink 
 % Parameters
@@ -134,10 +116,13 @@ Controller = 3;
 
 if Controller == 1
     K = k;
+    K2=0;
 elseif Controller == 2
     K = k_NL;
+    K2=0;
 elseif Controller ==3
-    K=k_bar2;
+    K=k_bar(1:4);
+    K2=k_bar(5);
 end
 
 
@@ -150,7 +135,7 @@ Model = 2;
 Desired = 2;
 
 if Desired == 1
-    xd = [0 , 0 , 0 , 0];
+    xd = [0.5 , 0 , 0 , 0];
 else
     xd = [0.5 , 0 , 0 , 0];
 end
