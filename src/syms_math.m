@@ -98,7 +98,7 @@ k_bar=place(A_bar,B_bar,p_bar);
 
 %%part 5
 z_0=[0 ; 0 ; 0 ; 0];
-L=(place(A',C',(p-2.5)))';
+L=(place(A',C',(p-2.5)*7.5))';
 [V3,s3]=eig(A-L*C);
 x_initial_hat=[0,0,0,0];
 
@@ -159,33 +159,37 @@ delx=x-x_hat;
 plot(t,x1)
 hold on
 plot(t,x_hat(:,1))
-title('X vs Time')
+title('X vs. Time')
 xlabel('Time (s)')
 ylabel('X (m)')
-legend('x','x hat')
+legend('x','\^{x}')
+
 figure
 plot(t,theta)
 hold on
 plot(t,rad2deg(x_hat(:,3)+pi())-180)
-title('Theta vs Time')
-xlabel('Time(s)')
-ylabel('Theta(deg)')
-legend('theta','theta hat')
+title('Theta vs. Time')
+xlabel('Time (s)')
+ylabel('Theta (deg)')
+legend('\theta','\^{\theta}')
+
 figure
 plot(t,u1)
-title('Input vs Time')
+title('Input vs. Time')
 ylabel('Force (N)')
 xlabel('Time (s)')
+
 figure
 plot(t,delx(:,1))
-ylabel('Error X')
+ylabel('Error X (m)')
 xlabel('Time (s)')
-title('Error Over Time X')
+title('Error vs. Time: X')
+
 figure
 plot(t,rad2deg(delx(:,3)))
-ylabel('Error Phi')
+ylabel('Error \phi  (degs)')
 xlabel('Time (s)')
-title('Error Over Time Phi')
+title('Error vs. Time: \phi')
 
 
 
