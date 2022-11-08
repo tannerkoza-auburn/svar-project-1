@@ -102,6 +102,12 @@ L=(place(A',C',(p-2.5)))';
 [V3,s3]=eig(A-L*C);
 x_initial_hat=[0,0,0,0];
 
+%%part 6
+T=[C; 0 , 1 , 0 , 0 ;0  , 0 , 0, 1 ];
+A_t=T*A*inv(T);
+A2=A_t(1:2,3:4);
+A4=A_t(3:4,3:4);
+L2=(place(A4',A2',[p(1)-2.5,p(3)-2.5]))';
 %% Simulink 
 % Parameters
 linewidth = 2;
@@ -147,7 +153,7 @@ else
 end
 
 % Run Simulation
-[t,~,x,u1,x_hat] = sim('P1_Sim_Simulink2');
+[t,~,x,u1,x_hat] = sim('P1_Sim_Simulink3');
 %   x is the state vector of [x; x_dot; phi; phi_dot],  4x1 vector
 
 x1 = x(:,1);% Cart x position plot
