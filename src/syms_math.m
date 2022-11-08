@@ -74,10 +74,10 @@ z1=0.2; %damping term 1
 z2=0.4; %damping term 2
 
 %placing max eignvalues
-p=[roots([1 wnz (wnz/z1)^2]),roots([1 wnz (wnz/z2)^2])]; 
+p=[roots([1 2*wnz (wnz/z1)^2]),roots([1 2*wnz (wnz/z2)^2])]; 
 p=[p(1,1),p(1,2),p(2,1),p(2,2)];
 %determining controller gains
-k=place(A,B,p-1);
+k=place(A,B,p-2.5);
 
 %problem 2 
 [V2,s2]=eig(A-B*k);
@@ -93,8 +93,14 @@ B_bar=[B ; zeros(1,1)];
 CO_bar=ctrb(A_bar,B_bar);
 rank_C_bar=rank(CO_bar);
 
-p_bar=[p-1.5,-1.9];
+p_bar=[p-1.5,-2.3];
 k_bar=place(A_bar,B_bar,p_bar);
+
+%%part 5
+z_0=[0 ; 0 ; 0 ; 0];
+L=(place(A',C',(p-2.5)))';
+[V3,s3]=eig(A-L*C);
+x_initial_hat=[0,0,0,0];
 
 %% Simulink 
 % Parameters
@@ -112,7 +118,7 @@ x_initial = [0.5 ; 0 ; deg2rad(30) ; 0];
 % Set the Controller:
    % 1 = State-feedback linear model
    % 2 = .... so on
-Controller = 3;
+Controller = 1;
 
 if Controller == 1
     K = k;
@@ -132,37 +138,56 @@ Model = 2;
 
 % Set Desired State
 % Set the desired state: 1 = Regulation, 2 = Setpoint Tracking.
-Desired = 2;
+Desired = 1;
 
 if Desired == 1
-    xd = [0.5 , 0 , 0 , 0];
+    xd = [0 , 0 , 0 , 0];
 else
     xd = [0.5 , 0 , 0 , 0];
 end
 
 % Run Simulation
-[t,~,x,u1] = sim('P1_Sim_Simulink');
+[t,~,x,u1,x_hat] = sim('P1_Sim_Simulink2');
 %   x is the state vector of [x; x_dot; phi; phi_dot],  4x1 vector
 
 x1 = x(:,1);% Cart x position plot
 phi = x(:,3);
 theta = rad2deg((phi+pi()))-180;
-
+delx=x-x_hat;
 
 %% Plots
 plot(t,x1)
+hold on
+plot(t,x_hat(:,1))
 title('X vs Time')
 xlabel('Time (s)')
 ylabel('X (m)')
+legend('x','x hat')
 figure
 plot(t,theta)
+hold on
+plot(t,rad2deg(x_hat(:,3)+pi())-180)
 title('Theta vs Time')
 xlabel('Time(s)')
 ylabel('Theta(deg)')
+legend('theta','theta hat')
 figure
 plot(t,u1)
 title('Input vs Time')
 ylabel('Force (N)')
 xlabel('Time (s)')
+figure
+plot(t,delx(:,1))
+ylabel('Error X')
+xlabel('Time (s)')
+title('Error Over Time X')
+figure
+plot(t,rad2deg(delx(:,3)))
+ylabel('Error Phi')
+xlabel('Time (s)')
+title('Error Over Time Phi')
+
+
+
 
 
