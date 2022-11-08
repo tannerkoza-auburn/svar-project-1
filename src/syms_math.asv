@@ -124,7 +124,7 @@ x_initial = [0.5 ; 0 ; deg2rad(30) ; 0];
 % Set the Controller:
    % 1 = State-feedback linear model
    % 2 = .... so on
-Controller = 1; % change to 3 for #4
+Controller = 3; % change to 3 for #4
 
 if Controller == 1
     K = k;
@@ -140,7 +140,7 @@ end
 
 % Set Model
 % Set the model to use: 1 = linear, 2 = nonlinear.
-Model = 1;
+Model = 2;
 
 % Set Desired State
 % Set the desired state: 1 = Regulation, 2 = Setpoint Tracking.
@@ -160,46 +160,46 @@ end
 x1 = x(:,1);% Cart x position plot
 phi = x(:,3);
 theta = rad2deg((phi+pi()))-180;
-delx=x-x_hat;
+% delx=x-x_hat;
 
 %% Plots
 figure('Name','States & Error vs. Time')
 
 subplot(2,1,1)
-yyaxis left
+% yyaxis left
 plot(t,x1)
-hold on
-plot(t,x_hat(:,1))
+% hold on
+% plot(t,x_hat(:,1),'b')
 ylabel('position (m)')
 axis([-0.25 6 -0.8 0.8])
 
-yyaxis right
-plot(t,delx(:,1))
-ylabel('error (m)')
-axis([-0.25 6 -0.8 0.8])
+% yyaxis right
+% plot(t,delx(:,1))
+% ylabel('error (m)')
+% axis([-0.25 6 -0.8 0.8])
 
 title('x vs. Time')
 xlabel('time (s)')
-legend('x','$$\hat{x}$$','error','Interpreter','Latex')
+legend('x','x error','Interpreter','Latex')
 
 subplot(2,1,2)
 
-yyaxis left
+% yyaxis left
 plot(t,theta)
 ylabel('angle (degs)')
-hold on
-plot(t,rad2deg(x_hat(:,3)+pi())-180)
+% hold on
+% plot(t,rad2deg(x_hat(:,3)+pi())-180)
 axis([-0.25 6 -40 40])
 
-yyaxis right
-plot(t,rad2deg(delx(:,3)))
-ylabel('error (degs)')
-axis([-0.25 6 -40 40])
+% yyaxis right
+% % plot(t,rad2deg(delx(:,3)))
+% ylabel('error (degs)')
+% axis([-0.25 6 -40 40])
 
 title('\theta vs. Time')
 xlabel('time (s)')
 ylabel('\theta (deg)')
-legend('$$\theta$$','$$\hat{\theta}$$','error','Interpreter','Latex')
+legend('$$\theta$$','$$\theta$$ error','Interpreter','Latex')
 
 % matlab2tikz('../report/figs/p3-a-states.tex','showInfo', false)
 
@@ -208,7 +208,7 @@ plot(t,u1)
 title('Input vs. Time')
 ylabel('force (N)')
 xlabel('time (s)')
-axis([-0.25 6 -20 10])
+axis([-0.25 6 -10 10])
 
 % matlab2tikz('../report/figs/p3-a-input.tex','showInfo', false)
 

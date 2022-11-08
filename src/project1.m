@@ -1,0 +1,80 @@
+%% State Variable Project 1
+
+clear
+clc
+close all
+
+%% Problem 3
+
+% System Initialization
+M = 0.5; % cart mass (kg)
+m = 0.2; % pendulum mass (kg)
+b = 0.1; % coeff friction cart (N/m/sec)
+I = 0.006; % pendulum mass moment of inertia (kg*m^2)
+g = 9.81; % gravity (m/s^2)
+l = 0.3; % length to pendulum COM (m)
+
+x0 = [-0.5; 0; 30; 0]; % initial conditions
+
+d = I*(M+m)+M*m*l^2;
+
+A = [0      1              0           0;
+     0 -(I+m*l^2)*b/d  (m^2*g*l^2)/d   0;
+     0      0              0           1;
+     0 -(m*l*b)/d       m*g*l*(M+m)/d  0];
+B = [     0;
+     (I+m*l^2)/d;
+          0;
+        m*l/d];
+C = [1 0 0 0;
+     0 0 1 0];
+D = [0;
+     0];
+
+states = {'x' 'x_dot' 'phi' 'phi_dot'};
+inputs = {'u'};
+outputs = {'x'; 'phi'};
+
+sys_ss = ss(A,B,C,D,'statename',states,'inputname',inputs,'outputname',outputs);
+
+% State Feedback Regulator Simulation
+
+wn_co = 1; % desired natural frequency (rad/s)
+zeta_co = 0.8; % desired damping ratio
+s_des_co = [-2.3 + 3.92*1i, ...
+           -2.3 - 3.92*1i, ...
+           -2.3 + 1.83*1i, ...
+           -2.3 - 1.83*1i]; % Desired Controller Poles
+
+dt = 0.0001; % Simulation Time Step & Time Vector
+t = 0:dt:50;
+
+K = place(A,B,s_des_co);
+
+u = zeros(1,length(t));
+y = zeros(2, length(t));
+x = zeros(4,length(t));
+dx = zeros(4,length(t));
+xhat = zeros(4,length(t));
+dxhat = zeros(4,length(t));
+
+x(:,1) = [-0.5; 0; 30; 0]; % Initialized State & State Estimate
+r = [0; 0; 0; 0]; % Reference 
+
+for i = 1:length(t) - 1
+
+    u(i) = K*(r -x(:,i)); % Control Input
+
+    y(:,i) = C*x(:,i); % Actual State "Measurements"
+
+    dx(:,i) = A*x(:,i) + B*u(i); % Actual State Derivative
+
+    x(:,i+1) = x(:,i) + dx(:,i)*dt; % Integrate Actual States
+
+end
+
+figure
+plot(t,x(1,:))
+hold on
+plot(t,x(3,:))
+% axis([0 5 -1 50])

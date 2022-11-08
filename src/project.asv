@@ -1,0 +1,36 @@
+%% State Variable Project 1
+
+clear
+clc
+close all
+
+%% Problem 3
+
+M = 0.5; % cart mass (kg)
+m = 0.2; % pendulum mass (kg)
+b = 0.1; % coeff friction cart (N/m/sec)
+I = 0.006; % pendulum mass moment of inertia (kg*m^2)
+g = 9.81; % gravity (m/s^2)
+l = 0.3; % length to pendulum COM (m)
+
+d = I*(M+m)+M*m*l^2;
+
+A = [0      1              0           0;
+     0 -(I+m*l^2)*b/d  (m^2*g*l^2)/d   0;
+     0      0              0           1;
+     0 -(m*l*b)/d       m*g*l*(M+m)/d  0];
+B = [     0;
+     (I+m*l^2)/d;
+          0;
+        m*l/d];
+C = [1 0 0 0;
+     0 0 1 0];
+D = [0;
+     0];
+
+states = {'x' 'x_dot' 'phi' 'phi_dot'};
+inputs = {'u'};
+outputs = {'x'; 'phi'};
+
+sys_ss = ss(A,B,C,D,'statename',states,'inputname',inputs,'outputname',outputs);
+
