@@ -98,7 +98,7 @@ k_bar=place(A_bar,B_bar,p_bar);
 
 %%part 5
 z_0=[0 ; 0 ; 0 ; 0];
-L=(place(A',C',(p-1.5)*7.5))';
+L=(place(A',C',(p-1.5)))';
 [V3,s3]=eig(A-L*C);
 x_initial_hat=[0,0,0,0];
 
@@ -107,7 +107,7 @@ T=[C; 0 , 1 , 0 , 0 ;0  , 0 , 0, 1 ];
 A_t=T*A*inv(T);
 A2=A_t(1:2,3:4);
 A4=A_t(3:4,3:4);
-L2=(place(A4',A2',[p(1)-2.5,p(3)-2.5]))';
+L2=(place(A4',A2',[p(1)-1.5,p(3)-1.5]*7.5))';
 %% Simulink 
 % Parameters
 linewidth = 2;
@@ -140,7 +140,7 @@ end
 
 % Set Model
 % Set the model to use: 1 = linear, 2 = nonlinear.
-Model = 1;
+Model = 2;
 
 % Set Desired State
 % Set the desired state: 1 = Regulation, 2 = Setpoint Tracking.
@@ -153,7 +153,7 @@ else
 end
 
 % Run Simulation
-[t,~,x,u1,x_hat] = sim('P1_Sim_Simulink2');
+[t,~,x,u1,x_hat] = sim('P1_Sim_Simulink3');
 % [t,~,x,u1] = sim('P1_Sim_Simulink');
 %   x is the state vector of [x; x_dot; phi; phi_dot],  4x1 vector
 
@@ -171,12 +171,12 @@ plot(t,x1)
 hold on
 plot(t,x_hat(:,1))
 ylabel('position (m)')
-axis([-0.25 6 -0.8 0.8])
+axis([-0.25 6 -1.5 0.8])
 
 yyaxis right
 plot(t,delx(:,1))
 ylabel('error (m)')
-axis([-0.25 6 -0.8 0.8])
+axis([-0.25 6 -1.5 0.8])
 
 title('x vs. Time')
 xlabel('time (s)')
@@ -201,6 +201,8 @@ xlabel('time (s)')
 ylabel('\theta (deg)')
 legend('$$\theta$$','$$\hat{\theta}$$','error','Interpreter','Latex')
 
+
+
 % matlab2tikz('../report/figs/p3-a-states.tex','showInfo', false)
 
 figure('Name', 'Input vs. Time')
@@ -208,7 +210,7 @@ plot(t,u1)
 title('Input vs. Time')
 ylabel('force (N)')
 xlabel('time (s)')
-axis([-0.25 6 -20 10])
+axis([-0.25 6 -120 35])
 
 % matlab2tikz('../report/figs/p3-a-input.tex','showInfo', false)
 
